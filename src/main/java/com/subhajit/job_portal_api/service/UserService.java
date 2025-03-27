@@ -4,8 +4,7 @@ import com.subhajit.job_portal_api.dto.AuthenticationCredentialsRequestDTO;
 import com.subhajit.job_portal_api.dto.UserSignupRequestDTO;
 import com.subhajit.job_portal_api.dto.UserResponseDTO;
 import com.subhajit.job_portal_api.dto.Role;
-import com.subhajit.job_portal_api.exception.UnauthorizedAccessException;
-import com.subhajit.job_portal_api.exception.UserNotFoundException;
+import com.subhajit.job_portal_api.exception.JobPortalCustomException;
 import com.subhajit.job_portal_api.model.User;
 import com.subhajit.job_portal_api.repository.UserRepository;
 import com.subhajit.job_portal_api.util.JwtUtil;
@@ -13,18 +12,17 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-// TODO:- create a UserDetailsServiceImpl for laodUserByUsername method to be overridden
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -43,8 +41,7 @@ public class UserService {
 
         // check if user already exists
         if(userRepository.existsByUsername(userRequestDTO.getUsername())){
-            // TODO:- change the UserNotFound to a custom Exception with custom status code of conflict (409)
-            throw new UserNotFoundException("User already exists");
+            throw new JobPortalCustomException("User already exists", HttpStatus.CONFLICT);
         }
 
 
@@ -73,8 +70,7 @@ public class UserService {
             user.setPassword(null);
             return jwtUtil.generateToken(user);
         } catch (BadCredentialsException e) {
-            // TODO:- change this to something else with status code for unauthorized 401
-            throw new UserNotFoundException("Invalid credentials");
+            throw new JobPortalCustomException("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -83,8 +79,7 @@ public class UserService {
         Role roleType = Role.from(role);
 
         if(roleType.equals(Role.ADMIN)){
-            // TODO:- change this to something meaningful with status code.
-            throw new UserNotFoundException(roleType.name() + " cannot fetch other " + roleType.name() + " details , please select some other role to fetch");
+            throw new JobPortalCustomException(roleType.name() + " cannot fetch other " + roleType.name() + " details , please select some other role to fetch", HttpStatus.UNAUTHORIZED);
         }
 
         // get all users of the above role (employer/job_seeker)

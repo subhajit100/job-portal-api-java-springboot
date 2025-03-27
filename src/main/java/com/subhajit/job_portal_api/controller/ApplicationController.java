@@ -22,8 +22,6 @@ public class ApplicationController {
     private final ApplicationService applicationService;
     private final CommonUtils commonUtils;
 
-    // TODO:- when authentication enabled then jobSeekerId is not required in path params, and will be taken from authentication context
-
     // add a new application by job_seeker , POST /api/applications/{jobSeekerId}
     @PostMapping
     @PreAuthorize("hasRole('JOB_SEEKER')")

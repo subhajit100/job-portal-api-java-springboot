@@ -3,15 +3,14 @@ package com.subhajit.job_portal_api.service;
 import com.subhajit.job_portal_api.dto.JobRequestDTO;
 import com.subhajit.job_portal_api.dto.JobResponseDTO;
 import com.subhajit.job_portal_api.dto.Role;
-import com.subhajit.job_portal_api.exception.JobNotFoundException;
-import com.subhajit.job_portal_api.exception.UnauthorizedAccessException;
-import com.subhajit.job_portal_api.exception.UserNotFoundException;
+import com.subhajit.job_portal_api.exception.JobPortalCustomException;
 import com.subhajit.job_portal_api.model.Job;
 import com.subhajit.job_portal_api.model.User;
 import com.subhajit.job_portal_api.repository.JobRepository;
 import com.subhajit.job_portal_api.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,11 +34,11 @@ public class JobService {
     @Transactional
     public JobResponseDTO registerJob(JobRequestDTO jobRequestDTO, Long employerId) {
         // check if employer exists
-        User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
+        User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
 
         // if exists then check if it is of role EMPLOYER
         if(!employer.getRole().equals(Role.EMPLOYER)){
-            throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
+            throw new JobPortalCustomException("User with id " + employerId + " is not an employer", HttpStatus.CONFLICT);
         }
 
         // create a Job model object
@@ -70,19 +69,19 @@ public class JobService {
     @Transactional
     public JobResponseDTO updateJobById(Long employerId, Long jobId, JobRequestDTO jobRequestDTO) {
         // check if employer exists
-        User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
+        User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
 
         // if exists then check if it is of role EMPLOYER
         if(!employer.getRole().equals(Role.EMPLOYER)){
-            throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
+            throw new JobPortalCustomException("User with id " + employerId + " is not an employer", HttpStatus.CONFLICT);
         }
 
         // check if job exists
-        Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobNotFoundException("Job with id " + jobId + " not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobPortalCustomException("Job with id " + jobId + " not found", HttpStatus.NOT_FOUND));
 
         // check if job is connected to the employer
         if(!job.getEmployer().getId().equals(employer.getId())){
-            throw new UnauthorizedAccessException("Job with id " + jobId + " does not belong to employer with id " + employerId);
+            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.UNAUTHORIZED);
         }
 
         // update the job with jobRequestDTO fields
@@ -114,12 +113,12 @@ public class JobService {
 
 
         // check if job exists
-        Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobNotFoundException("Job with id " + jobId + " not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobPortalCustomException("Job with id " + jobId + " not found", HttpStatus.NOT_FOUND));
 
 
         // check if job is connected to the authenticated employer
         if(Objects.nonNull(employerId) && !job.getEmployer().getId().equals(employerId)){
-            throw new UnauthorizedAccessException("Job with id " + jobId + " does not belong to employer with id " + employerId);
+            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.UNAUTHORIZED);
         }
 
         jobRepository.delete(job);

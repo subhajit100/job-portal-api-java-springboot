@@ -21,8 +21,6 @@ public class JobController {
     private final JobService jobService;
     private final CommonUtils commonUtils;
 
-    // TODO:- when authentication enabled then employerId is not required in path params, and will be taken from authentication context
-
     // POST a new job by employer, POST /api/jobs/{employerId}
     @PostMapping
     @PreAuthorize("hasRole('EMPLOYER')")

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class ErrorResponseDTO {
+    private Integer statusCode;
     private String message;
     @JsonProperty("time_stamp")
     private LocalDateTime timeStamp;

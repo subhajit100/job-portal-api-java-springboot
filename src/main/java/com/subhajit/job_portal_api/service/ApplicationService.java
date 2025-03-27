@@ -4,10 +4,7 @@ import com.subhajit.job_portal_api.dto.ApplicationPostRequestDTO;
 import com.subhajit.job_portal_api.dto.ApplicationResponseDTO;
 import com.subhajit.job_portal_api.dto.ApplicationUpdateRequestDTO;
 import com.subhajit.job_portal_api.dto.Role;
-import com.subhajit.job_portal_api.exception.ApplicationNotFoundException;
-import com.subhajit.job_portal_api.exception.JobNotFoundException;
-import com.subhajit.job_portal_api.exception.UnauthorizedAccessException;
-import com.subhajit.job_portal_api.exception.UserNotFoundException;
+import com.subhajit.job_portal_api.exception.*;
 import com.subhajit.job_portal_api.model.Application;
 import com.subhajit.job_portal_api.model.Job;
 import com.subhajit.job_portal_api.model.User;
@@ -17,6 +14,7 @@ import com.subhajit.job_portal_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,15 +34,15 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponseDTO registerApplication(ApplicationPostRequestDTO applicationPostRequestDTO, Long jobSeekerId) {
         // find if a jobSeeker exists with the jobSeekerId
-        User jobSeeker = userRepository.findById(jobSeekerId).orElseThrow(() -> new UserNotFoundException("User with id " + jobSeekerId + " not found"));
+        User jobSeeker = userRepository.findById(jobSeekerId).orElseThrow(() -> new JobPortalCustomException("User with id " + jobSeekerId + " not found", HttpStatus.NOT_FOUND));
 
         // if exists then check if it is of role
         if(!jobSeeker.getRole().equals(Role.JOB_SEEKER)){
-            throw new IllegalArgumentException("User with id " + jobSeekerId + " is not a job_seeker");
+            throw new JobPortalCustomException("User with id " + jobSeekerId + " is not a job_seeker", HttpStatus.CONFLICT);
         }
 
         // check if job id exists or not?
-        Job job = jobRepository.findById(applicationPostRequestDTO.getAppliedJobId()).orElseThrow(() -> new JobNotFoundException("Job with id " + applicationPostRequestDTO.getAppliedJobId() + " not found"));
+        Job job = jobRepository.findById(applicationPostRequestDTO.getAppliedJobId()).orElseThrow(() -> new JobPortalCustomException("Job with id " + applicationPostRequestDTO.getAppliedJobId() + " not found", HttpStatus.NOT_FOUND));
 
         // create an application
         Application application = Application.builder().coverLetter(applicationPostRequestDTO.getCoverLetter()).appliedDate(LocalDateTime.now()).applicant(jobSeeker).job(job).build();
@@ -74,19 +72,19 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponseDTO updateApplicationById(Long jobSeekerId, Long applicationId, ApplicationUpdateRequestDTO applicationUpdateRequestDTO) {
         // find if a jobSeeker exists with the jobSeekerId
-        User jobSeeker = userRepository.findById(jobSeekerId).orElseThrow(() -> new UserNotFoundException("User with id " + jobSeekerId + " not found"));
+        User jobSeeker = userRepository.findById(jobSeekerId).orElseThrow(() -> new JobPortalCustomException("User with id " + jobSeekerId + " not found", HttpStatus.NOT_FOUND));
 
         // if exists then check if it is of role
         if(!jobSeeker.getRole().equals(Role.JOB_SEEKER)){
-            throw new IllegalArgumentException("User with id " + jobSeekerId + " is not a job_seeker");
+            throw new JobPortalCustomException("User with id " + jobSeekerId + " is not a job_seeker", HttpStatus.CONFLICT);
         }
 
         // check if application with applicationId exists
-        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new ApplicationNotFoundException("Application with id " + applicationId + " not found"));
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new JobPortalCustomException("Application with id " + applicationId + " not found", HttpStatus.NOT_FOUND));
 
         // check if the jobSeeker has only posted this application
         if(!application.getApplicant().getId().equals(jobSeeker.getId())){
-            throw new UnauthorizedAccessException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId);
+            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.UNAUTHORIZED);
         }
 
         // update the application with request dto object
@@ -104,11 +102,11 @@ public class ApplicationService {
     @Transactional
     public void deleteApplicationById(Long jobSeekerId, Long applicationId) {
         // check if application with applicationId exists
-        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new ApplicationNotFoundException("Application with id " + applicationId + " not found"));
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new JobPortalCustomException("Application with id " + applicationId + " not found", HttpStatus.NOT_FOUND));
 
         // check if the jobSeeker has only posted this application
         if(Objects.nonNull(jobSeekerId) && !application.getApplicant().getId().equals(jobSeekerId)){
-            throw new UnauthorizedAccessException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId);
+            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.UNAUTHORIZED);
         }
 
         // delete the application
