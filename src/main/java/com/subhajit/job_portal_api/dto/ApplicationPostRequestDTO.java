@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ApplicationRequestDTO {
+public class ApplicationPostRequestDTO {
     @JsonProperty("cover_letter")
     @NotBlank(message = "cover_letter should not be empty")
     @Size(min = 5 , message = "cover_letter should be at least 5 characters long")

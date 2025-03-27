@@ -6,11 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class UserRequestDTO {
-    @JsonProperty("user_name")
-    @Size(min = 2, message = "user_name should be at least 2 characters long")
-    @NotBlank(message = "user_name is mandatory")
-    private String userName;
+public class UserSignupRequestDTO {
+    @Size(min = 2, message = "username should be at least 2 characters long")
+    @NotBlank(message = "username is mandatory")
+    private String username;
     @NotBlank(message = "email is mandatory")
     private String email;
     @NotBlank(message = "password is mandatory")

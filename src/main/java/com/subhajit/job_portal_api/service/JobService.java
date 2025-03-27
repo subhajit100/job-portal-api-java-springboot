@@ -2,7 +2,7 @@ package com.subhajit.job_portal_api.service;
 
 import com.subhajit.job_portal_api.dto.JobRequestDTO;
 import com.subhajit.job_portal_api.dto.JobResponseDTO;
-import com.subhajit.job_portal_api.dto.UserType;
+import com.subhajit.job_portal_api.dto.Role;
 import com.subhajit.job_portal_api.exception.JobNotFoundException;
 import com.subhajit.job_portal_api.exception.UnauthorizedAccessException;
 import com.subhajit.job_portal_api.exception.UserNotFoundException;
@@ -22,7 +22,7 @@ import java.util.Objects;
 @Service
 public class JobService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    // TODO:- add log statements to start and end of every service method
+    // TODO:- add log statements to start and end of every service method using lombok log42j logger
 
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
@@ -37,8 +37,8 @@ public class JobService {
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
 
-        // if exists then check if it is of userType EMPLOYER
-        if(!employer.getUserType().equals(UserType.EMPLOYER)){
+        // if exists then check if it is of role EMPLOYER
+        if(!employer.getRole().equals(Role.EMPLOYER)){
             throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
         }
 
@@ -53,15 +53,16 @@ public class JobService {
     }
 
     public List<JobResponseDTO> getAllJobsPostedByEmployer(Long employerId) {
-        // check if employer exists
-        User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
 
-        // if exists then check if it is of userType EMPLOYER
-        if(!employer.getUserType().equals(UserType.EMPLOYER)){
-            throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
+        List<Job> jobs;
+
+        if(Objects.nonNull(employerId)){
+            jobs = jobRepository.findByEmployerId(employerId);
         }
-
-        List<Job> jobs = jobRepository.findByEmployerId(employerId);
+        else{
+            // means the authentication token is of an ADMIN
+            jobs = jobRepository.findAll();
+        }
 
         return jobs.stream().map(job -> JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).description(job.getDescription()).location(job.getLocation()).postedDate(job.getPostedDate()).reqYearsOfExp(job.getReqYearsOfExp()).build()).toList();
     }
@@ -71,8 +72,8 @@ public class JobService {
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
 
-        // if exists then check if it is of userType EMPLOYER
-        if(!employer.getUserType().equals(UserType.EMPLOYER)){
+        // if exists then check if it is of role EMPLOYER
+        if(!employer.getRole().equals(Role.EMPLOYER)){
             throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
         }
 
@@ -110,19 +111,14 @@ public class JobService {
 
     @Transactional
     public void deleteJobById(Long employerId, Long jobId) {
-        // check if employer exists
-        User employer = userRepository.findById(employerId).orElseThrow(() -> new UserNotFoundException("User with id " + employerId + " not found"));
 
-        // if exists then check if it is of userType EMPLOYER
-        if(!employer.getUserType().equals(UserType.EMPLOYER)){
-            throw new IllegalArgumentException("User with id " + employerId + " is not an employer");
-        }
 
         // check if job exists
         Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobNotFoundException("Job with id " + jobId + " not found"));
 
-        // check if job is connected to the employer
-        if(!job.getEmployer().getId().equals(employer.getId())){
+
+        // check if job is connected to the authenticated employer
+        if(Objects.nonNull(employerId) && !job.getEmployer().getId().equals(employerId)){
             throw new UnauthorizedAccessException("Job with id " + jobId + " does not belong to employer with id " + employerId);
         }
 
