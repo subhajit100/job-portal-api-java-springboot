@@ -8,6 +8,8 @@ import com.subhajit.job_portal_api.model.Job;
 import com.subhajit.job_portal_api.model.User;
 import com.subhajit.job_portal_api.repository.JobRepository;
 import com.subhajit.job_portal_api.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,20 +21,15 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Log4j2
+@RequiredArgsConstructor
 public class JobService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    // TODO:- add log statements to start and end of every service method using lombok log42j logger
-
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
 
-    public JobService(JobRepository jobRepository, UserRepository userRepository) {
-        this.jobRepository = jobRepository;
-        this.userRepository = userRepository;
-    }
-
     @Transactional
     public JobResponseDTO registerJob(JobRequestDTO jobRequestDTO, Long employerId) {
+        log.info("Posting a new job by the employer with id: {}", employerId);
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
 
@@ -47,6 +44,7 @@ public class JobService {
         // save to jobRepository
         jobRepository.save(job);
 
+        log.info("Posted the job successfully with id: {}", job.getId());
         // create a jobResponseDTO and return.
         return JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).build();
     }
@@ -56,18 +54,22 @@ public class JobService {
         List<Job> jobs;
 
         if(Objects.nonNull(employerId)){
+            log.info("Fetching all jobs posted by employer with id: {}", employerId);
             jobs = jobRepository.findByEmployerId(employerId);
         }
         else{
+            log.info("Fetching all jobs posted by employers");
             // means the authentication token is of an ADMIN
             jobs = jobRepository.findAll();
         }
 
+        log.info("Successfully fetched {} job postings", jobs.size());
         return jobs.stream().map(job -> JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).description(job.getDescription()).location(job.getLocation()).postedDate(job.getPostedDate()).reqYearsOfExp(job.getReqYearsOfExp()).build()).toList();
     }
 
     @Transactional
     public JobResponseDTO updateJobById(Long employerId, Long jobId, JobRequestDTO jobRequestDTO) {
+        log.info("Updating job posting with id: {}", jobId);
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
 
@@ -104,13 +106,14 @@ public class JobService {
         // save the job to repository
         jobRepository.save(job);
 
+        log.info("Job posting with id: {} updated successfully", jobId);
         // return the new updated jobResponseDTO
         return JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).build();
     }
 
     @Transactional
     public void deleteJobById(Long employerId, Long jobId) {
-
+        log.info("Deleting job posting with id: {}", jobId);
 
         // check if job exists
         Job job = jobRepository.findById(jobId).orElseThrow(() -> new JobPortalCustomException("Job with id " + jobId + " not found", HttpStatus.NOT_FOUND));
@@ -122,5 +125,6 @@ public class JobService {
         }
 
         jobRepository.delete(job);
+        log.info("Successfully deleted job posting with id: {}", jobId);
     }
 }

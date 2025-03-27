@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 // TODO:- add swagger api docs.
+// TODO:- add javadoc
 @SpringBootApplication
 public class JobPortalApiApplication {
 

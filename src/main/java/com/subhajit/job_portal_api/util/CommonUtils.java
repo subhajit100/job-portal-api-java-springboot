@@ -18,7 +18,6 @@ public class CommonUtils {
     public Long getUserIdFromAuthContext(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("Subhajit: fetched username from auth context " + username);
         return getUserIdFromUsername(username);
     }
 

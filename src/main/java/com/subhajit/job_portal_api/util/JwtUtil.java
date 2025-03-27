@@ -42,7 +42,6 @@ public class JwtUtil {
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
-        System.out.println("subhajit: get claims " + claims.toString());
         return claimsResolver.apply(claims);
     }
 
@@ -80,7 +79,6 @@ public class JwtUtil {
     }
 
     private SecretKey getSignKey() {
-        System.out.println("subhajit: get jwt token secret " + secret + " expiration time " + jwtTokenValidity);
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
