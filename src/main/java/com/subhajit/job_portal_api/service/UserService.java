@@ -34,6 +34,18 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Registers a new user with the specified role.
+     *
+     * <p>This method checks if the username already exists. If not, it creates a new user
+     * with the provided details, encodes the password, saves the user to the repository, and returns
+     * a {@link UserResponseDTO} with the user's details.</p>
+     *
+     * @param userRequestDTO the user details for registration, including username, email, and password
+     * @param role the role of the user (e.g., JOB_SEEKER, EMPLOYER)
+     * @return a {@link UserResponseDTO} containing the newly registered user's details
+     * @throws JobPortalCustomException if the username already exists
+     */
     @Transactional
     public UserResponseDTO registerUser(UserSignupRequestDTO userRequestDTO, String role) {
         // extract the role from request params
@@ -59,7 +71,16 @@ public class UserService {
         return UserResponseDTO.builder().id(user.getId()).username(user.getUsername()).email(user.getEmail()).role(roleType).build();
     }
 
-
+    /**
+     * Authenticates a user and generates a JWT token upon successful login.
+     *
+     * <p>This method attempts to authenticate the user using the provided credentials.
+     * If authentication is successful, a JWT token is generated and returned.</p>
+     *
+     * @param authCredentialsRequestDTO the user's authentication credentials containing username and password
+     * @return a JWT token as a {@link String} if authentication is successful
+     * @throws JobPortalCustomException if the credentials are invalid
+     */
     public String loginUser(@Valid AuthenticationCredentialsRequestDTO authCredentialsRequestDTO) {
         try {
             log.info("Trying to login for a user with name: {}", authCredentialsRequestDTO.getUsername());
@@ -78,6 +99,16 @@ public class UserService {
         }
     }
 
+    /**
+     * Retrieves a list of users based on their role.
+     *
+     * <p>This method filters users by the specified role and returns a list of user details.
+     * Admin users are restricted from fetching other admin details.</p>
+     *
+     * @param role the role of users to fetch (e.g., "EMPLOYER" or "JOB_SEEKER")
+     * @return a list of {@link UserResponseDTO} objects containing user details
+     * @throws JobPortalCustomException if an admin attempts to fetch other admin details or if the role is invalid
+     */
     public List<UserResponseDTO> getUsers(String role) {
         // extract the role from request params
         Role roleType = Role.from(role);

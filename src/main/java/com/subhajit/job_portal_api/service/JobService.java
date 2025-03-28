@@ -3,6 +3,7 @@ package com.subhajit.job_portal_api.service;
 import com.subhajit.job_portal_api.dto.JobRequestDTO;
 import com.subhajit.job_portal_api.dto.JobResponseDTO;
 import com.subhajit.job_portal_api.dto.Role;
+import com.subhajit.job_portal_api.dto.UserResponseDTO;
 import com.subhajit.job_portal_api.exception.JobPortalCustomException;
 import com.subhajit.job_portal_api.model.Job;
 import com.subhajit.job_portal_api.model.User;
@@ -27,6 +28,17 @@ public class JobService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Registers a new job posting for a given employer.
+     *
+     * <p>This method checks if the employer exists and has the correct role before
+     * creating and saving a new job in the repository.</p>
+     *
+     * @param jobRequestDTO the job details provided by the employer
+     * @param employerId the unique identifier of the employer posting the job
+     * @return a {@link JobResponseDTO} containing the job's ID and title
+     * @throws JobPortalCustomException if the employer does not exist or is not of role {@link Role#EMPLOYER}
+     */
     @Transactional
     public JobResponseDTO registerJob(JobRequestDTO jobRequestDTO, Long employerId) {
         log.info("Posting a new job by the employer with id: {}", employerId);
@@ -49,6 +61,15 @@ public class JobService {
         return JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).build();
     }
 
+    /**
+     * Retrieves a list of job postings based on the employer's ID.
+     *
+     * <p>If an employer ID is provided, it fetches jobs posted by that specific employer.
+     * If no employer ID is provided, it fetches all job postings (accessible by an admin).</p>
+     *
+     * @param employerId the unique identifier of the employer (optional, if null, retrieves all jobs)
+     * @return a list of {@link JobResponseDTO} containing job details
+     */
     public List<JobResponseDTO> getAllJobsPostedByEmployer(Long employerId) {
 
         List<Job> jobs;
@@ -67,6 +88,18 @@ public class JobService {
         return jobs.stream().map(job -> JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).description(job.getDescription()).location(job.getLocation()).postedDate(job.getPostedDate()).reqYearsOfExp(job.getReqYearsOfExp()).build()).toList();
     }
 
+    /**
+     * Updates an existing job posting for a given employer.
+     *
+     * <p>This method ensures that the employer exists, has the correct role, and owns the job before updating its details.</p>
+     *
+     * @param employerId the unique identifier of the employer attempting to update the job
+     * @param jobId the unique identifier of the job to be updated
+     * @param jobRequestDTO the updated job details provided by the employer
+     * @return an updated {@link JobResponseDTO} containing the job's ID and title
+     * @throws JobPortalCustomException if the employer does not exist, is not of role {@link Role#EMPLOYER},
+     *         the job does not exist, or the job does not belong to the specified employer
+     */
     @Transactional
     public JobResponseDTO updateJobById(Long employerId, Long jobId, JobRequestDTO jobRequestDTO) {
         log.info("Updating job posting with id: {}", jobId);
@@ -111,6 +144,15 @@ public class JobService {
         return JobResponseDTO.builder().id(job.getId()).title(job.getTitle()).build();
     }
 
+    /**
+     * Deletes a job posting if it belongs to the specified employer.
+     *
+     * <p>This method ensures that the job exists and is associated with the given employer before deleting it.</p>
+     *
+     * @param employerId the unique identifier of the employer attempting to delete the job
+     * @param jobId the unique identifier of the job to be deleted
+     * @throws JobPortalCustomException if the job does not exist or does not belong to the specified employer
+     */
     @Transactional
     public void deleteJobById(Long employerId, Long jobId) {
         log.info("Deleting job posting with id: {}", jobId);

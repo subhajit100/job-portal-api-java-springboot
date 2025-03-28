@@ -30,6 +30,17 @@ public class ApplicationService {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
 
+    /**
+     * Registers a new job application for a given jobSeeker.
+     *
+     * <p>This method ensures that the jobSeeker exists, has the correct role, and that the job being applied for exists before creating an application.</p>
+     *
+     * @param applicationPostRequestDTO the request data containing the job ID and cover letter
+     * @param jobSeekerId the unique identifier of the jobSeeker submitting the application
+     * @return an {@link ApplicationResponseDTO} containing the application ID, cover letter, applied job ID, and applied date
+     * @throws JobPortalCustomException if the jobSeeker does not exist, is not of role {@link Role#JOB_SEEKER},
+     *         or if the job being applied for does not exist
+     */
     @Transactional
     public ApplicationResponseDTO registerApplication(ApplicationPostRequestDTO applicationPostRequestDTO, Long jobSeekerId) {
         log.info("Creating a new application for a job posting by jobSeeker with id: {}", jobSeekerId);
@@ -55,6 +66,15 @@ public class ApplicationService {
         return ApplicationResponseDTO.builder().id(application.getId()).coverLetter(application.getCoverLetter()).appliedDate(application.getAppliedDate()).appliedJobId(application.getJob().getId()).build();
     }
 
+    /**
+     * Retrieves all job applications submitted by a specific jobSeeker.
+     *
+     * <p>If a jobSeeker ID is provided, this method fetches only the applications submitted by that jobSeeker. If no ID is provided, it fetches all applications, assuming the request is made by an admin.</p>
+     *
+     * @param jobSeekerId the unique identifier of the jobSeeker whose applications are being retrieved (nullable for admin access)
+     * @return a list of {@link ApplicationResponseDTO} containing details of each application
+     * @throws JobPortalCustomException if no applications are found for the given jobSeeker ID
+     */
     public List<ApplicationResponseDTO> getAllApplicationsPostedByJobSeeker(Long jobSeekerId) {
         List<Application> applications;
         if(Objects.nonNull(jobSeekerId)){
@@ -73,6 +93,17 @@ public class ApplicationService {
         return applications.stream().map(application -> ApplicationResponseDTO.builder().id(application.getId()).coverLetter(application.getCoverLetter()).appliedDate(application.getAppliedDate()).appliedJobId(application.getJob().getId()).build()).toList();
     }
 
+    /**
+     * Updates an existing job application submitted by a jobSeeker.
+     *
+     * <p>This method checks if the jobSeeker exists and has the correct role. It also verifies that the application exists and belongs to the specified jobSeeker before updating the cover letter.</p>
+     *
+     * @param jobSeekerId the unique identifier of the jobSeeker attempting to update the application
+     * @param applicationId the unique identifier of the application to be updated
+     * @param applicationUpdateRequestDTO an object containing the new cover letter details for the application
+     * @return an {@link ApplicationResponseDTO} containing the updated application details
+     * @throws JobPortalCustomException if the jobSeeker does not exist, is not a jobSeeker, the application does not exist, or the application does not belong to the jobSeeker
+     */
     @Transactional
     public ApplicationResponseDTO updateApplicationById(Long jobSeekerId, Long applicationId, ApplicationUpdateRequestDTO applicationUpdateRequestDTO) {
         log.info("Updating application with id: {}", applicationId);
@@ -106,6 +137,15 @@ public class ApplicationService {
         return ApplicationResponseDTO.builder().id(application.getId()).coverLetter(application.getCoverLetter()).appliedJobId(application.getJob().getId()).appliedDate(application.getAppliedDate()).build();
     }
 
+    /**
+     * Deletes a job application submitted by a jobSeeker.
+     *
+     * <p>This method verifies the existence of the application and checks if the provided jobSeeker ID matches the applicant before allowing deletion.</p>
+     *
+     * @param jobSeekerId the unique identifier of the jobSeeker attempting to delete the application
+     * @param applicationId the unique identifier of the application to be deleted
+     * @throws JobPortalCustomException if the application does not exist or if the application does not belong to the specified jobSeeker
+     */
     @Transactional
     public void deleteApplicationById(Long jobSeekerId, Long applicationId) {
         // check if application with applicationId exists
