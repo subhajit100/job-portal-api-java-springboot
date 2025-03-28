@@ -120,7 +120,7 @@ public class ApplicationService {
 
         // check if the jobSeeker has only posted this application
         if(!application.getApplicant().getId().equals(jobSeeker.getId())){
-            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.UNAUTHORIZED);
+            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.FORBIDDEN);
         }
 
         // update the application with request dto object
@@ -154,7 +154,7 @@ public class ApplicationService {
 
         // check if the jobSeeker has only posted this application
         if(Objects.nonNull(jobSeekerId) && !application.getApplicant().getId().equals(jobSeekerId)){
-            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.UNAUTHORIZED);
+            throw new JobPortalCustomException("Application with id " + applicationId + " does not belong to job seeker with id " + jobSeekerId, HttpStatus.FORBIDDEN);
         }
 
         // delete the application

@@ -115,7 +115,7 @@ public class UserService {
 
         log.info("Fetching all users with role: {}", roleType.name());
         if(roleType.equals(Role.ADMIN)){
-            throw new JobPortalCustomException(roleType.name() + " cannot fetch other " + roleType.name() + " details , please select some other role to fetch", HttpStatus.UNAUTHORIZED);
+            throw new JobPortalCustomException(roleType.name() + " cannot fetch other " + roleType.name() + " details , please select some other role to fetch", HttpStatus.FORBIDDEN);
         }
 
         // get all users of the above role (employer/job_seeker)

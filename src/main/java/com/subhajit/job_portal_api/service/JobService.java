@@ -116,7 +116,7 @@ public class JobService {
 
         // check if job is connected to the employer
         if(!job.getEmployer().getId().equals(employer.getId())){
-            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.UNAUTHORIZED);
+            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.FORBIDDEN);
         }
 
         // update the job with jobRequestDTO fields
@@ -163,7 +163,7 @@ public class JobService {
 
         // check if job is connected to the authenticated employer
         if(Objects.nonNull(employerId) && !job.getEmployer().getId().equals(employerId)){
-            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.UNAUTHORIZED);
+            throw new JobPortalCustomException("Job with id " + jobId + " does not belong to employer with id " + employerId, HttpStatus.FORBIDDEN);
         }
 
         jobRepository.delete(job);
