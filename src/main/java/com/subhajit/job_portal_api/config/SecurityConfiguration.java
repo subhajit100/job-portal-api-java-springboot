@@ -40,7 +40,9 @@ public class SecurityConfiguration {
                                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                                 .requestMatchers(
                                         "/api/auth/signup",
-                                        "/api/auth/login", "/h2-console/**").permitAll()
+                                        "/api/auth/login", "/h2-console/**","/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
                 ).
                 sessionManagement(sessionManagement ->
