@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,7 +57,7 @@ public class ApplicationService {
         Job job = jobRepository.findById(applicationPostRequestDTO.getAppliedJobId()).orElseThrow(() -> new JobPortalCustomException("Job with id " + applicationPostRequestDTO.getAppliedJobId() + " not found", HttpStatus.NOT_FOUND));
 
         // create an application
-        Application application = Application.builder().coverLetter(applicationPostRequestDTO.getCoverLetter()).appliedDate(LocalDateTime.now()).applicant(jobSeeker).job(job).build();
+        Application application = Application.builder().coverLetter(applicationPostRequestDTO.getCoverLetter()).appliedDate(LocalDateTime.now(ZoneOffset.UTC)).applicant(jobSeeker).job(job).build();
 
         // save the application to the db
         applicationRepository.save(application);
