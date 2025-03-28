@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class Job {
     private String description;
     private int reqYearsOfExp;
     private String location;
-    private LocalDateTime postedDate;
+    private Instant postedDate;
 
     @ManyToOne
     @JoinColumn(name = "employer_id") // for db, employer_id will be shown

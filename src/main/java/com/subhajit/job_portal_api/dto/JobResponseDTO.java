@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -22,5 +22,5 @@ public class JobResponseDTO {
     private Integer reqYearsOfExp;
     private String location;
     @JsonProperty("posted_date")
-    private LocalDateTime postedDate;
+    private Instant postedDate;
 }

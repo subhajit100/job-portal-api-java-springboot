@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -21,14 +20,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(JobPortalCustomException.class)
     public ResponseEntity<Object> handleCustomException(JobPortalCustomException ex, WebRequest request) throws Exception {
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getHttpStatus().value(), ex.getMessage(), LocalDateTime.now(ZoneOffset.UTC), request.getDescription(false));
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getHttpStatus().value(), ex.getMessage(), Instant.now(), request.getDescription(false));
 
         return new ResponseEntity<>(errorResponseDTO, ex.getHttpStatus());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request) throws Exception {
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", LocalDateTime.now(ZoneOffset.UTC), request.getDescription(false));
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", Instant.now(), request.getDescription(false));
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -40,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(status.value(), errorMessage,LocalDateTime.now(ZoneOffset.UTC), request.getDescription(false));
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(status.value(), errorMessage,Instant.now(), request.getDescription(false));
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
     }
 }

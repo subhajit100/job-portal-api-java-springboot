@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -20,7 +20,7 @@ public class Application {
     private Long id;
 
     private String coverLetter;
-    private LocalDateTime appliedDate;
+    private Instant appliedDate;
 
     @ManyToOne
     @JoinColumn(name = "job_id")

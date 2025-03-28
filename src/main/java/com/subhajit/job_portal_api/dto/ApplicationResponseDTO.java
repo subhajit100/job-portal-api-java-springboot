@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +20,7 @@ public class ApplicationResponseDTO {
     @JsonProperty("cover_letter")
     private String coverLetter;
     @JsonProperty("applied_date")
-    private LocalDateTime appliedDate;
+    private Instant appliedDate;
     @JsonProperty("job_id")
     private Long appliedJobId;
 }

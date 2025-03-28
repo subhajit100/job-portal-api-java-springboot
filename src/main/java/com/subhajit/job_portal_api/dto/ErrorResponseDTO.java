@@ -1,17 +1,15 @@
 package com.subhajit.job_portal_api.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
 public class ErrorResponseDTO {
-    private Integer statusCode;
+    private Integer status;
     private String message;
-    @JsonProperty("time_stamp")
-    private LocalDateTime timeStamp;
+    private Instant timestamp;
     private String description;
 }

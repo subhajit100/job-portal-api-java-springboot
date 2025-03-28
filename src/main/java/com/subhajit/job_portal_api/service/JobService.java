@@ -15,8 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +49,7 @@ public class JobService {
         }
 
         // create a Job model object
-        Job job = Job.builder().title(jobPostRequestDTO.getTitle()).description(jobPostRequestDTO.getDescription()).location(jobPostRequestDTO.getLocation()).reqYearsOfExp(jobPostRequestDTO.getReqYearsOfExp()).postedDate(LocalDateTime.now(ZoneOffset.UTC)).employer(employer).build();
+        Job job = Job.builder().title(jobPostRequestDTO.getTitle()).description(jobPostRequestDTO.getDescription()).location(jobPostRequestDTO.getLocation()).reqYearsOfExp(jobPostRequestDTO.getReqYearsOfExp()).postedDate(Instant.now()).employer(employer).build();
 
         // save to jobRepository
         jobRepository.save(job);
