@@ -1,9 +1,9 @@
 package com.subhajit.job_portal_api.service;
 
-import com.subhajit.job_portal_api.dto.JobRequestDTO;
+import com.subhajit.job_portal_api.dto.JobPostRequestDTO;
 import com.subhajit.job_portal_api.dto.JobResponseDTO;
+import com.subhajit.job_portal_api.dto.JobUpdateRequestDTO;
 import com.subhajit.job_portal_api.dto.Role;
-import com.subhajit.job_portal_api.dto.UserResponseDTO;
 import com.subhajit.job_portal_api.exception.JobPortalCustomException;
 import com.subhajit.job_portal_api.model.Job;
 import com.subhajit.job_portal_api.model.User;
@@ -11,8 +11,6 @@ import com.subhajit.job_portal_api.repository.JobRepository;
 import com.subhajit.job_portal_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +32,13 @@ public class JobService {
      * <p>This method checks if the employer exists and has the correct role before
      * creating and saving a new job in the repository.</p>
      *
-     * @param jobRequestDTO the job details provided by the employer
+     * @param jobPostRequestDTO the job details provided by the employer
      * @param employerId the unique identifier of the employer posting the job
      * @return a {@link JobResponseDTO} containing the job's ID and title
      * @throws JobPortalCustomException if the employer does not exist or is not of role {@link Role#EMPLOYER}
      */
     @Transactional
-    public JobResponseDTO registerJob(JobRequestDTO jobRequestDTO, Long employerId) {
+    public JobResponseDTO registerJob(JobPostRequestDTO jobPostRequestDTO, Long employerId) {
         log.info("Posting a new job by the employer with id: {}", employerId);
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
@@ -51,7 +49,7 @@ public class JobService {
         }
 
         // create a Job model object
-        Job job = Job.builder().title(jobRequestDTO.getTitle()).description(jobRequestDTO.getDescription()).location(jobRequestDTO.getLocation()).reqYearsOfExp(jobRequestDTO.getReqYearsOfExp()).postedDate(LocalDateTime.now()).employer(employer).build();
+        Job job = Job.builder().title(jobPostRequestDTO.getTitle()).description(jobPostRequestDTO.getDescription()).location(jobPostRequestDTO.getLocation()).reqYearsOfExp(jobPostRequestDTO.getReqYearsOfExp()).postedDate(LocalDateTime.now()).employer(employer).build();
 
         // save to jobRepository
         jobRepository.save(job);
@@ -95,13 +93,13 @@ public class JobService {
      *
      * @param employerId the unique identifier of the employer attempting to update the job
      * @param jobId the unique identifier of the job to be updated
-     * @param jobRequestDTO the updated job details provided by the employer
+     * @param jobUpdateRequestDTO the updated job details provided by the employer
      * @return an updated {@link JobResponseDTO} containing the job's ID and title
      * @throws JobPortalCustomException if the employer does not exist, is not of role {@link Role#EMPLOYER},
      *         the job does not exist, or the job does not belong to the specified employer
      */
     @Transactional
-    public JobResponseDTO updateJobById(Long employerId, Long jobId, JobRequestDTO jobRequestDTO) {
+    public JobResponseDTO updateJobById(Long employerId, Long jobId, JobUpdateRequestDTO jobUpdateRequestDTO) {
         log.info("Updating job posting with id: {}", jobId);
         // check if employer exists
         User employer = userRepository.findById(employerId).orElseThrow(() -> new JobPortalCustomException("User with id " + employerId + " not found", HttpStatus.NOT_FOUND));
@@ -120,20 +118,20 @@ public class JobService {
         }
 
         // update the job with jobRequestDTO fields
-        if(Objects.nonNull(jobRequestDTO.getTitle())){
-            job.setTitle(jobRequestDTO.getTitle());
+        if(Objects.nonNull(jobUpdateRequestDTO.getTitle())){
+            job.setTitle(jobUpdateRequestDTO.getTitle());
         }
 
-        if(Objects.nonNull(jobRequestDTO.getDescription())){
-            job.setDescription(jobRequestDTO.getDescription());
+        if(Objects.nonNull(jobUpdateRequestDTO.getDescription())){
+            job.setDescription(jobUpdateRequestDTO.getDescription());
         }
 
-        if(Objects.nonNull(jobRequestDTO.getLocation())){
-            job.setLocation(jobRequestDTO.getLocation());
+        if(Objects.nonNull(jobUpdateRequestDTO.getLocation())){
+            job.setLocation(jobUpdateRequestDTO.getLocation());
         }
 
-        if(Objects.nonNull(jobRequestDTO.getReqYearsOfExp())){
-            job.setReqYearsOfExp(jobRequestDTO.getReqYearsOfExp());
+        if(Objects.nonNull(jobUpdateRequestDTO.getReqYearsOfExp())){
+            job.setReqYearsOfExp(jobUpdateRequestDTO.getReqYearsOfExp());
         }
 
         // save the job to repository

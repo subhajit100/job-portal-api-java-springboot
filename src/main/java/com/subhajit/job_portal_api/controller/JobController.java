@@ -1,14 +1,14 @@
 package com.subhajit.job_portal_api.controller;
 
 import com.subhajit.job_portal_api.dto.ErrorResponseDTO;
-import com.subhajit.job_portal_api.dto.JobRequestDTO;
+import com.subhajit.job_portal_api.dto.JobPostRequestDTO;
 import com.subhajit.job_portal_api.dto.JobResponseDTO;
+import com.subhajit.job_portal_api.dto.JobUpdateRequestDTO;
 import com.subhajit.job_portal_api.service.JobService;
 import com.subhajit.job_portal_api.util.CommonUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,11 +36,11 @@ public class JobController {
     @Operation(
             summary = "Register a new job posting",
             description = "Allows an employer to post a new job listing.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Job details to be posted",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = JobRequestDTO.class)
+                            schema = @Schema(implementation = JobPostRequestDTO.class)
                     )
             ),
             responses = {
@@ -69,7 +69,7 @@ public class JobController {
                     )
             }
     )
-    public ResponseEntity<JobResponseDTO> registerJob(@Valid @RequestBody JobRequestDTO job){
+    public ResponseEntity<JobResponseDTO> registerJob(@Valid @RequestBody JobPostRequestDTO job){
         // fetch the details of the present authenticated employer and get the id of that.
         Long employerId = commonUtils.getUserIdFromAuthContext();
         JobResponseDTO jobResponseDTO = jobService.registerJob(job, employerId);
@@ -112,11 +112,11 @@ public class JobController {
             parameters = {
                     @Parameter(name = "jobId", description = "ID of the job to update", required = true)
             },
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated job details",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = JobRequestDTO.class)
+                            schema = @Schema(implementation = JobUpdateRequestDTO.class)
                     )
             ),
             responses = {
@@ -142,10 +142,10 @@ public class JobController {
                     )
             }
     )
-    public ResponseEntity<JobResponseDTO> updateJobById(@PathVariable Long jobId, @Valid @RequestBody JobRequestDTO jobRequestDTO){
+    public ResponseEntity<JobResponseDTO> updateJobById(@PathVariable Long jobId, @Valid @RequestBody JobUpdateRequestDTO jobUpdateRequestDTO){
         // fetch the details of the present authenticated employer and get the id of that.
         Long employerId = commonUtils.getUserIdFromAuthContext();
-        JobResponseDTO updatedJobResponseDTO = jobService.updateJobById(employerId, jobId, jobRequestDTO);
+        JobResponseDTO updatedJobResponseDTO = jobService.updateJobById(employerId, jobId, jobUpdateRequestDTO);
         return new ResponseEntity<>(updatedJobResponseDTO, HttpStatus.OK);
     }
 

@@ -1,5 +1,8 @@
 package com.subhajit.job_portal_api.dto;
 
+import com.subhajit.job_portal_api.exception.JobPortalCustomException;
+import org.springframework.http.HttpStatus;
+
 import java.util.Arrays;
 
 public enum Role {
@@ -11,6 +14,6 @@ public enum Role {
         return Arrays.stream(values())
                 .filter(e -> e.name().equalsIgnoreCase(role))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid role: " + role));
+                .orElseThrow(() -> new JobPortalCustomException("Invalid role: " + role, HttpStatus.BAD_REQUEST));
     }
 }

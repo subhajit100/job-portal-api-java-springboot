@@ -23,7 +23,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getHttpStatus().value(), ex.getMessage(), LocalDateTime.now(), request.getDescription(false));
 
         return new ResponseEntity<>(errorResponseDTO, ex.getHttpStatus());
-
     }
 
     @ExceptionHandler(Exception.class)
@@ -31,7 +30,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", LocalDateTime.now(), request.getDescription(false));
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-
     }
 
     @Override

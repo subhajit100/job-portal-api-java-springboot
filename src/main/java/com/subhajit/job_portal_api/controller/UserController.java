@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,16 +28,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    // TODO:- there should be a sign out api as well to discard the present jwt token
-
     private final UserService userService;
-
 
     @PostMapping("/auth/signup")
     @Operation(
             summary = "Register a new user",
             description = "Allows a new user to sign up with a specified role.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "User signup request data",
                     required = true,
                     content = @Content(
@@ -76,12 +72,11 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
-
     @PostMapping("/auth/login")
     @Operation(
             summary = "User login",
             description = "Authenticates a user with their credentials and returns a JWT token in the Authorization header.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "User authentication credentials",
                     required = true,
                     content = @Content(

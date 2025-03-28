@@ -9,7 +9,6 @@ import com.subhajit.job_portal_api.util.CommonUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +38,7 @@ public class ApplicationController {
     @Operation(
             summary = "Register a new job application",
             description = "Allows an authenticated job seeker to submit a new job application.",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Job application request data",
                     required = true,
                     content = @Content(
@@ -121,7 +120,7 @@ public class ApplicationController {
                             in = ParameterIn.PATH
                     )
             },
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Updated application details",
                     required = true,
                     content = @Content(
