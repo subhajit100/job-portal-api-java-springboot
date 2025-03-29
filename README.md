@@ -37,6 +37,7 @@ To ensure security, **JWT authentication with Spring Security** is implemented f
 
 ### ER diagram for Job Portal system
 
+![Job Portal Schema](assets/job_portal_schema.gif)
 
 
 ## 2. System Requirements
